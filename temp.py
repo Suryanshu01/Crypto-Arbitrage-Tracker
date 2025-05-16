@@ -1,0 +1,180 @@
+import requests
+#
+#
+#
+# url1 = f"https://api-pub.bitfinex.com/v2/conf/pub:list:pair:exchange"
+#
+# url2=(f"https://api-pub.bitfinex.com/v2/conf/pub:map:currency:label")
+# response = requests.get(url1)
+# response2 = requests.get(url2)
+#
+# if response.status_code == 200:
+#     data = response.text
+#     # price = data[6]  # Assuming the price index is consistent across all tickers
+#     print(data, "\n\n")
+# if response2.status_code == 200:
+#     data2 = response2.text
+#     # price = data[6]  # Assuming the price index is consistent across all tickers
+#     print(data2)
+
+#
+# from python_bitvavo_api.bitvavo import Bitvavo
+#
+# from termcolor import colored
+# bitvavo = Bitvavo()
+#
+#
+# # prices = {}
+#
+#
+# response = bitvavo.markets()
+# if 'errorCode' not in response:
+#
+#       prices = response
+# # print(prices)
+# # print(colored("hello", "green", force_color=True))
+
+
+# url = f"https://api-pub.bitfinex.com/v2/ticker?symbols=ALL"
+# response = requests.get(url)
+#
+# if response.status_code == 200:
+#             data = response.json()
+# #             price = data  # Assuming the price index is consistent across all tickers
+# #             print(price)
+#
+# import requests
+#
+# url = "https://api-pub.bitfinex.com/v2/conf/pub:map:currency:sym"
+#
+# headers = {"accept": "application/json"}
+#
+# response = requests.get(url, headers=headers)
+# #
+# # print(response.text)
+#
+#
+# url = "https://api.coinbase.com/v2/exchange-rates"
+#     # prices = {}
+#
+# response = requests.get(url)
+# if response.status_code == 200:
+#         data = response.json()
+#         # prices[symbol] = data['data']['amount']
+#         prices = data
+#         # ['data']['amount']
+# else:
+#         prices = None
+#
+# # print( prices)
+#
+# url = "https://api.binance.com/api/v3/exchangeInfo"
+# response = requests.get(url)
+#
+# if response.status_code == 200:
+#         data = response.json()
+#         symbols = set()
+#
+#         for symbol_info in data['symbols']:
+#                 symbols.add(symbol_info['baseAsset'])
+#                 symbols.add(symbol_info['quoteAsset'])
+#
+#         print(sorted(symbols))
+
+#
+# import requests
+#
+# url = "https://api-pub.bitfinex.com/v2/conf/pub:map:currency:sym"
+#
+# headers = {"accept": "application/json"}
+#
+# response = requests.get(url, headers=headers)
+#
+# print(response.text)
+
+from endpoints import *
+tokens6 = {
+    'BEL': '0xA91ac63D040dEB1b7A5E4d4134aD23eb0ba07e14',
+    'AXS': '0xBB0E17EF65F82Ab018d8EDd776e8DD940327B28b',
+    'ACH': '0xEd04915c23f00A313a544955524EB7DBD823143d',
+    '8PAY': '0x06DDb3a8BC0aBc14f85e974CF1A93a6f8d4909d9',
+    'AAVE': '0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9',
+    'ALICE': '0xAC51066d7bEC65Dc4589368da368b212745d63E8',
+    'ALPHA': '0xa1faa113cbE53436Df28FF0aEe54275c13B40975',
+    'AMPL': '0xD46bA6D942050d489DBd938a2C909A5d5039A161',
+    'ANKR': '0x8290333ceF9e6D528dD5618Fb97a76f268f3EDD4',
+    'ALPA': '0x7cA4408137eb639570F8E647d9bD7B7E8717514A',
+    'ARPA': '0xBA50933C268F567BDC86E1aC131BE072C6B0b71a',
+    'ATA': '0xA2120b9e674d3fC3875f415A7DF52e382F141225',
+    'AXL': '0x467719aD09025FcC6cF6F8311755809d45a5E5f3',
+    'BAT': '0x0D8775F648430679A709E98d2b0Cb6250d2887EF',
+    'C98': '0xAE12C5930881c53715B369ceC7606B70d8EB229f',
+    'ETH': '0x0000000000000000000000000000000000000000',
+    'BTCB': '0xE57425F1598f9b0d6219706b77f4b3DA573a3695',
+    'USDC': '0xA0b86991c6218b36c1d19D4A2e9Eb0cE3606eB48',
+    'FXS': '0x3432B6A60D23Ca0dFCa7761B7ab56459D9C964D0',
+    'MC': '0xf4eCEd2f682CE333f96f2D8966C613DeD8fC95DD',
+    'FRAX': '0x853d955aCEf822Db058eb8505911ED77F175b99e',
+    'DAI': '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+    'WOO': '0x4691937a7508860F876c9c0a2a617E7d9E945D4B',
+    'UNI': '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984',
+    'SUPER': '0xe53EC727dbDEB9E2d5456c3be40cFF031AB40A55',
+    'WETH': '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+    'USDT': '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+    'RNDR': '0x6De037ef9aD2725EB40118Bb1702EBb27e4Aeb24',
+    'BEAM': '0x62D0A8458eD7719FDAF978fe5929C6D342B0bFcE',
+    'SAND': '0x3845badAde8e6dFF049820680d1F14bD3903a5d0',
+    'NEXO': '0xB62132e35a6c13ee1EE0f84dC5d40bad8d815206',
+    'IMX': '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+    'LPT': '0x58b6A8A3302369DAEc383334672404Ee733aB239',
+    'YFI': '0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e',
+    'QNT': '0x4a220E6096B25EADb88358cb44068A3248254675',
+    'CREAM': '0x2ba592F78dB6436527729929AAf6c908497cB200',
+    'GTC': '0xDe30da39c46104798bB5aA3fe8B9e0e1F348163F',
+    'LINK': '0x514910771AF9Ca656af840dff83E8264EcF986CA',
+    'MLN': '0xec67005c4E498Ec7f55E092bd1d35cbC47C91892',
+    'POL': '0x455e53CBB86018Ac2B8092FdCd39d8444aFFC3F6',
+    'SHIB': '0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE',
+    'MKR': '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2',
+    'ZRX': '0xe41d2489571d322189246dafa5ebde1f4699f498',
+    'SUSHI': '0x6b3595068778dd592e39a122f4f5a5cf09c90fe2',
+    'COMP': '0xc00e94cb662c3520282e6f5717214004a7f26888',
+    'ENJ': '0xf629cbd94d3791c9250152bd8dfbdf380e2a3b9c',
+    'XRUNE': '0x69fa0feE221AD11012BAb0FdB45d444D3D2Ce71c',
+    'AUDIO': '0x18aaa7115705e8be94bffebde57af9bfc265b998',
+    'GRT': '0xc944e90c64b2c07662a292be6244bdf05cda44a7',
+    'CRV': '0xd533a949740bb3306d119cc777fa900ba034cd52',
+    '1INCH': '0x111111111117dc0aa78b770fa6a738034120c302',
+    'BAL': '0xba100000625a3754423978a60c9317c58a424e3d',
+    'REN': '0x408e41876cccdc0f92210600ef50372656052a38',
+    'LRC': '0xbbbbca6a901c926f240b89eacb641d8aec7aeafd',
+    'OMG': '0xd26114cd6ee289accf82350c8d8487fedb8a0c07',
+    'KNC': '0xdd974d5c2e2928dea5f71b9825b8b646686bd200',
+    'YFII': '0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e',
+    'BNT': '0x1F573D6Fb3F13d689FF844B4cE37794d79a7FF1C',
+    'LINA': '0x3e9bc21c9b189c09df3ef1b824798658d5011937',
+    'API3': '0x0b38210ea11411557c13457d4da7dc6ea731b88a',
+    'BAND': '0xBA11D00c5f74255f56a5E366F4F77f5A186d7f55',
+    'RSR': '0x320623b8E4fF03373931769A31Fc52A4E78B5d70',
+    'COTI': '0xddb3422497e61e13543bea06989c0789117555c5',
+    'RLC': '0x607F4C5BB672230e8672085532f7e901544a7375',
+    'MANA': '0x0f5d2fb29fb7d3cfee444a200298f468908cc942',
+    'OCEAN': '0x967da4048cD07aB37855c090aAF366e4ce1b9F48',
+    'CTSI': '0x491604c0fDF08347Dd1fa4Ee062a822A5DD06B5D',
+    'POND': '0x57b946008913b82e4df85f501cbaed910e58d26c',
+    'SRM': '0x476c5e26a75bd202a9683ffd34359c0cc15be0ff'
+}
+
+# tokens_list=list(tokens6)
+#
+# for token in tokens_list:
+#     try:
+#         x=get_binance_prices('eth', token)
+#     except:
+#         print(token)
+#
+# def fun(a, b, c=1):
+#     return a + b + c
+#
+# print(fun(1, 2))
+

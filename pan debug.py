@@ -1,0 +1,415 @@
+import requests
+import json
+from datetime import datetime
+from web3 import Web3, HTTPProvider
+from termcolor import colored
+import time
+import ccxt
+from pan_token_analysis import token6_bep
+
+# Constants
+PRIVATE_KEY = "dcacdff3fce35db890ee008b69d16baedfcffade14396c71beba1586feaccf11"
+MORALIS_APIKEY = "8RzKHVWr03FVYji5VKFZFxLh5e5FQ9PZPqeUDtwYIGnZkPz1ounQkUoGLgSakDlo"
+DODO_APIKEY = "b13f92d15210daeefd"
+DODO_API_ENDPOINT = "https://api.dodoex.io/route-service/developer/getdodoroute"
+RPC_URL = "https://bsc-dataseed4.bnbchain.org"
+alchemy_url = "https://eth-mainnet.g.alchemy.com/v2/UcLnaPDIR4S2rplgaMDMe_g0VmTt4sJ1"
+ROUTES = ["pancakeswap_v2","uniswap_v2","dodo_dex"]
+# ROUTES = ["uniswap_v2"]
+
+
+
+W3 = Web3(HTTPProvider(RPC_URL))
+# Uniswap configuration
+uniswap_router_address = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
+factory_contr_addr="0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
+uniswap_abi_url = "https://api.etherscan.io/api?module=contract&action=getabi&address=" + uniswap_router_address
+response = requests.get(uniswap_abi_url)
+uniswap_abi = response.json()["result"]
+with open('factory.json') as f:
+    factory_abi = (json.load(f))['result']
+
+fact_contr=W3.eth.contract(address=factory_contr_addr, abi=factory_abi)
+
+
+tokens3={'BEL': '0xA91ac63D040dEB1b7A5E4d4134aD23eb0ba07e14', 'AXS': '0xBB0E17EF65F82Ab018d8EDd776e8DD940327B28b', 'ACH': '0xEd04915c23f00A313a544955524EB7DBD823143d',
+         # 'CAKE': '0x152649eA73beAb28c5b49B26eb48f7EAD6d4c898',
+         '8PAY': '0x06DDb3a8BC0aBc14f85e974CF1A93a6f8d4909d9', 'AAVE': '0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9', 'ALICE': '0xAC51066d7bEC65Dc4589368da368b212745d63E8', 'ALPHA': '0xa1faa113cbE53436Df28FF0aEe54275c13B40975', 'AMPL': '0xD46bA6D942050d489DBd938a2C909A5d5039A161', 'ANKR': '0x8290333ceF9e6D528dD5618Fb97a76f268f3EDD4', 'ALPACA': '0x7cA4408137eb639570F8E647d9bD7B7E8717514A', 'ARPA': '0xBA50933C268F567BDC86E1aC131BE072C6B0b71a', 'ATA': '0xA2120b9e674d3fC3875f415A7DF52e382F141225', 'AXL': '0x467719aD09025FcC6cF6F8311755809d45a5E5f3', 'BAT': '0x0D8775F648430679A709E98d2b0Cb6250d2887EF', 'C98': '0xAE12C5930881c53715B369ceC7606B70d8EB229f', 'ETH': '0x0000000000000000000000000000000000000000', 'BTCB': '0xE57425F1598f9b0d6219706b77f4b3DA573a3695', 'USDC': '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', 'FXS': '0x3432B6A60D23Ca0dFCa7761B7ab56459D9C964D0', 'MC': '0xf4eCEd2f682CE333f96f2D8966C613DeD8fC95DD', 'FRAX': '0x853d955aCEf822Db058eb8505911ED77F175b99e', 'DAI': '0x6B175474E89094C44Da98b954EedeAC495271d0F', 'WOO': '0x4691937a7508860F876c9c0a2a617E7d9E945D4B', 'UNI': '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984', 'SUPER': '0xe53EC727dbDEB9E2d5456c3be40cFF031AB40A55', 'WETH': '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', 'USDT': '0xdAC17F958D2ee523a2206206994597C13D831ec7'}
+
+tokens2={
+    'BEL': '0xA91ac63D040dEB1b7A5E4d4134aD23eb0ba07e14',
+    'AXS': '0xF5b0C8a6a4817d1EF21941D0693f8ef0d83Eb0D3',
+    'ACH': '0xEd04915c23f00A313a544955524EB7DBD823143d',
+    'CAKE': '0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82',
+    '8PAY': '0xFe8A6B9E6c1eE8B16c1F7487264B00f3f2F83661',
+    'AAVE': '0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9',
+    'ALICE': '0xAC51066d7bEC65Dc4589368da368b212745d63E8',
+    'ALPHA': '0xa1faa113cbE53436Df28FF0aEe54275c13B40975',
+    'AMPL': '0xD46bA6D942050d489DBd938a2C909A5d5039A161',
+    'ANKR': '0x8290333ceF9e6D528dD5618Fb97a76f268f3EDD4',
+    'ALPACA': '0x8F0528cE5eF7B51152A59745bEfDD91D97091d2F',
+    'ARPA': '0xBa50933c268f567BdD9a2323f39d6a3359e0ffE1',
+    'ARV': '0x6679eB24F59dFe111864AEc72B443d1Da666B360',
+    'ASR': '0x02D8b46814E4C8F19de6a3d21326410Cd8ab52F0',
+    'ATA': '0xA2120b9e674d3fC3875f415A7DF52e382F141225',
+    'ATM': '0xa1faa113cbE53436Df28FF0aEe54275c13B40975',
+    'AXL': '0x3f7aFF0Ef20AA2E646290DfA1E5D9cA3bEf1Baf1',
+    'BABYCAKE': '0xdB8D30b74bf098aF214e862C90E647bbB1fcC58c',
+    'BAKE': '0xE02dF9e3e622DeBdD69fb838bB799E3F168902c5',
+    'BALBT': '0xba100000625a3754423978a60c9317c58a424e3D',
+    'BAND': '0xba11d3ab8A58d8f53c687c7C77F58B1979F112C6',
+    'BAT': '0x0D8775F648430679A709E98d2b0Cb6250d2887EF',
+    'BCFX': '0x1Fc31488f28ac846588FFA201cDe0669168471bD',
+    'C98': '0xaEC945e04baF28b135Fa7c640f624f8D90F1C3a6',
+    'ETH': '0x0000000000000000000000000000000000000000',
+    'BTCB': '0x7130D2a12B9Acbfd57d1B4fC99d68ecB17e2a3D3',
+    'USDC': '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+    'FXS': '0xe48A3d7d0Bc88d552f730B62c006bC925eadB9eE',
+    'MC': '0x949D48EcA67b17269629c7194F4b727d4Ef9E5d6',
+    'FRAX': '0x853d955aCEf822Db058eb8505911ED77F175b99e',
+    'DAI': '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+    'WOO': '0x4691937a7508860F876c9c0a2a617E7d9E945D4B',
+    'UNI': '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984',
+    'SUPER': '0xe53EC727dbDEB9E2d5456c3be40cFF031AB40A55',
+    'WETH': '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+    'USDT': '0xdAC17F958D2ee523a2206206994597C13D831ec7'
+}
+
+COINS = {
+    "usdt": "0x55d398326f99059fF775485246999027B3197955",
+    "weth": "0x4DB5a66E937A9F4473fA95b1cAF1d1E1D62E29EA",
+    "eth": "0x2170Ed0880ac9A755fd29B2688956BD959F933F8",
+    "btcb": "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c",
+    "usdc": "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
+    "fxs": "0xe48A3d7d0Bc88d552f730B62c006bC925eadB9eE",
+    "mc": "0x949D48EcA67b17269629c7194F4b727d4Ef9E5d6",
+    "frax": "0x90C97F71E18723b0Cf0dfa30ee176Ab653E89F40",
+    "dai": "0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3",
+    "woo": "0x4691937a7508860F876c9c0a2a617E7d9E945D4B",
+    "uni": "0xBf5140A22578168FD562DCcF235E5D43A02ce9B1",
+    "super": "0x51BA0b044d96C3aBfcA52B64D733603CCC4F0d4D",
+    "wbnb": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
+    "cell": "0xd98438889Ae7364c7E2A3540547Fad042FB24642",
+    "sand": "0x67b725d7e342d7B611fa85e859Df9697D9378B2e",
+    "shib": "0x2859e4544C4bB03966803b044A93563Bd2D0DD4D",
+    'bel': '0x8443f091997f06a61670B735ED92734F5628692F',
+    'axs': '0x715D400F88C167884bbCc41C5FeA407ed4D2f8A0',
+    'ach': '0xBc7d6B50616989655AfD682fb42743507003056D',
+    "cake": "0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82",
+    "8pay": "0xFeea0bDd3D07eb6FE305938878C0caDBFa169042",
+    "aave": "0xfb6115445Bff7b52FeB98650C87f44907E58f802",
+    "ach": "0xBc7d6B50616989655AfD682fb42743507003056D",
+    "ada": "0x3EE2200Efb3400fAbB9AacF31297cBdD1d435D47",
+    "adx": "0x6bfF4Fb161347ad7de4A625AE5aa3A1CA7077819",
+    "alice": "0xAC51066d7bEC65Dc4589368da368b212745d63E8",
+    "alpa": "0xc5E6689C9c8B02be7C49912Ef19e79cF24977f03",
+    "alpaca": "0x8F0528cE5eF7B51152A59745bEfDD91D97091d2F",
+    "alpha": "0xa1faa113cbE53436Df28FF0aEe54275c13B40975",
+    "ampl": "0xDB021b1B247fe2F1fa57e0A87C748Cc1E321F07F",
+    "ankr": "0xf307910A4c7bbc79691fD374889b36d8531B08e3",
+    "ankrbnb": "0x52F24a5e03aee338Da5fd9Df68D2b6FAe1178827",
+    "antex": "0xCA1aCAB14e85F30996aC83c64fF93Ded7586977C",
+    "anymtlx": "0x5921DEE8556c4593EeFCFad3CA5e2f618606483b",
+    "aog": "0x40C8225329Bd3e28A043B029E0D07a5344d2C27C",
+    "ape": "0xC762043E211571eB34f1ef377e5e8e76914962f9",
+    "apx": "0x78F5d389F5CDCcFc41594aBaB4B0Ed02F31398b3",
+    "apys": "0x37dfACfaeDA801437Ff648A1559d73f4C40aAcb7",
+    "arena": "0xCfFD4D3B517b77BE32C76DA768634dE6C738889B",
+    "arpa": "0x6F769E65c14Ebd1f68817F5f1DcDb61Cfa2D6f7e",
+    "arv": "0x6679eB24F59dFe111864AEc72B443d1Da666B360",
+    "asr": "0x80D5f92C2c8C682070C95495313dDB680B267320",
+    "ata": "0xA2120b9e674d3fC3875f415A7DF52e382F141225",
+    "atm": "0x25E9d05365c867E59C1904E7463Af9F312296f9E",
+    "atom": "0x0Eb3a705fc54725037CC9e008bDede697f62F335",
+    "axl": "0x8b1f4432F943c465A973FeDC6d7aa50Fc96f1f65",
+    "axs": "0x715D400F88C167884bbCc41C5FeA407ed4D2f8A0",
+    "babycake": "0xdB8D30b74bf098aF214e862C90E647bbB1fcC58c",
+    "bake": "0xE02dF9e3e622DeBdD69fb838bB799E3F168902c5",
+    "balbt": "0x72fAa679E1008Ad8382959FF48E392042A8b06f7",
+    "band": "0xAD6cAEb32CD2c308980a548bD0Bc5AA4306c6c18",
+    "bat": "0x101d82428437127bF1608F699CD651e6Abf9766E",
+    "bath": "0x0bc89aa98Ad94E6798Ec822d0814d934cCD0c0cE",
+    "bbt": "0xD48474E7444727bF500a32D5AbE01943f3A59A64",
+    "bcfx": "0x045c4324039dA91c52C55DF5D785385Aab073DcF",
+    "c98": "0xaEC945e04baF28b135Fa7c640f624f8D90F1C3a6"
+}
+COIN_SYMBOLS = {
+    "0x55d398326f99059ff775485246999027b3197955": "usdt",
+    "0x4db5a66e937a9f4473fa95b1caf1d1e1d62e29ea": "weth",
+    "0x2170ed0880ac9a755fd29b2688956bd959f933f8": "eth",
+    "0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c": "btcb",
+    "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d": "usdc",
+    "0xe48a3d7d0bc88d552f730b62c006bc925eadb9ee": "fxs",
+    "0x949d48eca67b17269629c7194f4b727d4ef9e5d6": "mc",
+    "0x90c97f71e18723b0cf0dfa30ee176ab653e89f40": "frax",
+    "0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3": "dai",
+    "0x4691937a7508860f876c9c0a2a617e7d9e945d4b": "woo",
+    "0xbf5140a22578168fd562dccf235e5d43a02ce9b1": "uni",
+    "0x51ba0b044d96c3abfca52b64d733603ccc4f0d4d": "super",
+    "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c": "wbnb",
+    "0xd98438889ae7364c7e2a3540547fad042fb24642": "cell",
+    "0x67b725d7e342d7b611fa85e859df9697d9378b2e": "sand",
+    "0x2859e4544c4bb03966803b044a93563bd2d0dd4d": "shib",
+    '0x8443f091997f06a61670b735ed92734f5628692f': 'bel',
+    '0x715d400f88c167884bbcc41c5fea407ed4d2f8a0': 'axs',
+    '0xbc7d6b50616989655afd682fb42743507003056d': 'ach',
+    "0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82": "cake",
+    "0xfeea0bdd3d07eb6fe305938878c0cadbfa169042": "8pay",
+    "0xfb6115445bff7b52feb98650c87f44907e58f802": "aave",
+    "0xbc7d6b50616989655afd682fb42743507003056d": "ach",
+    "0x3ee2200efb3400fabb9aacf31297cbdd1d435d47": "ada",
+    "0x6bff4fb161347ad7de4a625ae5aa3a1ca7077819": "adx",
+    "0xac51066d7bec65dc4589368da368b212745d63e8": "alice",
+    "0xc5e6689c9c8b02be7c49912ef19e79cf24977f03": "alpa",
+    "0x8f0528ce5ef7b51152a59745befdd91d97091d2f": "alpaca",
+    "0xa1faa113cbe53436df28ff0aee54275c13b40975": "alpha",
+    "0xdb021b1b247fe2f1fa57e0a87c748cc1e321f07f": "ampl",
+    "0xf307910a4c7bbc79691fd374889b36d8531b08e3": "ankr",
+    "0x52f24a5e03aee338da5fd9df68d2b6fae1178827": "ankrbnb",
+    "0xca1acab14e85f30996ac83c64ff93ded7586977c": "antex",
+    "0x5921dee8556c4593eefcfad3ca5e2f618606483b": "anymtlx",
+    "0x40c8225329bd3e28a043b029e0d07a5344d2c27c": "aog",
+    "0xc762043e211571eb34f1ef377e5e8e76914962f9": "ape",
+    "0x78f5d389f5cdccfc41594abab4b0ed02f31398b3": "apx",
+    "0x37dfacfaeda801437ff648a1559d73f4c40aacb7": "apys",
+    "0xcffd4d3b517b77be32c76da768634de6c738889b": "arena",
+    "0x6f769e65c14ebd1f68817f5f1dcdb61cfa2d6f7e": "arpa",
+    "0x6679eb24f59dfe111864aec72b443d1da666b360": "arv",
+    "0x80d5f92c2c8c682070c95495313ddb680b267320": "asr",
+    "0xa2120b9e674d3fc3875f415a7df52e382f141225": "ata",
+    "0x25e9d05365c867e59c1904e7463af9f312296f9e": "atm",
+    "0x0eb3a705fc54725037cc9e008bdede697f62f335": "atom",
+    "0x8b1f4432f943c465a973fedc6d7aa50fc96f1f65": "axl",
+    "0x715d400f88c167884bbcc41c5fea407ed4d2f8a0": "axs",
+    "0xdb8d30b74bf098af214e862c90e647bbb1fcc58c": "babycake",
+    "0xe02df9e3e622debdd69fb838bb799e3f168902c5": "bake",
+    "0x72faa679e1008ad8382959ff48e392042a8b06f7": "balbt",
+    "0xad6caeb32cd2c308980a548bd0bc5aa4306c6c18": "band",
+    "0x101d82428437127bf1608f699cd651e6abf9766e": "bat",
+    "0x0bc89aa98ad94e6798ec822d0814d934ccd0c0ce": "bath",
+    "0xd48474e7444727bf500a32d5abe01943f3a59a64": "bbt",
+    "0x045c4324039da91c52c55df5d785385aab073dcf": "bcfx",
+    "0xaec945e04baf28b135fa7c640f624f8d90f1c3a6": "c98"
+}
+symbols2={
+    '0xA91ac63D040dEB1b7A5E4d4134aD23eb0ba07e14': 'BEL',
+    '0xF5b0C8a6a4817d1EF21941D0693f8ef0d83Eb0D3': 'AXS',
+    '0xEd04915c23f00A313a544955524EB7DBD823143d': 'ACH',
+    '0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82': 'CAKE',
+    '0xFe8A6B9E6c1eE8B16c1F7487264B00f3f2F83661': '8PAY',
+    '0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9': 'AAVE',
+    '0xAC51066d7bEC65Dc4589368da368b212745d63E8': 'ALICE',
+    '0xa1faa113cbE53436Df28FF0aEe54275c13B40975': 'ATM',
+    '0xD46bA6D942050d489DBd938a2C909A5d5039A161': 'AMPL',
+    '0x8290333ceF9e6D528dD5618Fb97a76f268f3EDD4': 'ANKR',
+    '0x8F0528cE5eF7B51152A59745bEfDD91D97091d2F': 'ALPACA',
+    '0xBa50933c268f567BdD9a2323f39d6a3359e0ffE1': 'ARPA',
+    '0x6679eB24F59dFe111864AEc72B443d1Da666B360': 'ARV',
+    '0x02D8b46814E4C8F19de6a3d21326410Cd8ab52F0': 'ASR',
+    '0xA2120b9e674d3fC3875f415A7DF52e382F141225': 'ATA',
+    '0x3f7aFF0Ef20AA2E646290DfA1E5D9cA3bEf1Baf1': 'AXL',
+    '0xdB8D30b74bf098aF214e862C90E647bbB1fcC58c': 'BABYCAKE',
+    '0xE02dF9e3e622DeBdD69fb838bB799E3F168902c5': 'BAKE',
+    '0xba100000625a3754423978a60c9317c58a424e3D': 'BALBT',
+    '0xba11d3ab8A58d8f53c687c7C77F58B1979F112C6': 'BAND',
+    '0x0D8775F648430679A709E98d2b0Cb6250d2887EF': 'BAT',
+    '0x1Fc31488f28ac846588FFA201cDe0669168471bD': 'BCFX',
+    '0xaEC945e04baF28b135Fa7c640f624f8D90F1C3a6': 'C98',
+    '0x0000000000000000000000000000000000000000': 'ETH',
+    '0x7130D2a12B9Acbfd57d1B4fC99d68ecB17e2a3D3': 'BTCB',
+    '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48': 'USDC',
+    '0xe48A3d7d0Bc88d552f730B62c006bC925eadB9eE': 'FXS',
+    '0x949D48EcA67b17269629c7194F4b727d4Ef9E5d6': 'MC',
+    '0x853d955aCEf822Db058eb8505911ED77F175b99e': 'FRAX',
+    '0x6B175474E89094C44Da98b954EedeAC495271d0F': 'DAI',
+    '0x4691937a7508860F876c9c0a2a617E7d9E945D4B': 'WOO',
+    '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984': 'UNI',
+    '0xe53EC727dbDEB9E2d5456c3be40cFF031AB40A55': 'SUPER',
+    '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2': 'WETH',
+    '0xdAC17F958D2ee523a2206206994597C13D831ec7': 'USDT'
+}
+
+SOLID_COIN = ["weth", "usdt", "usdc", "btcb", "eth"]  # usdt address
+# SOLID_COIN = ["usdt", "eth"]  # usdt address
+VARIABLE_COIN = [
+    'bel',
+    'axs',
+    'ach',
+    'cake',
+    '8pay',
+    'aave',
+    'ach',
+    'ada',
+    'adx',
+    'alice',
+    'alpa',
+    'alpaca',
+    'alpha',
+    'ampl',
+    'ankr',
+    'ankrbnb',
+    'antex',
+    'anymtlx',
+    'aog',
+    'ape',
+    'apx',
+    'apys',
+    'arena',
+    'arpa',
+    'arv',
+    'asr',
+    'ata',
+    'atm',
+    'atom',
+    'axl',
+    'axs',
+    'babycake',
+    'bake',
+    'balbt',
+    'band',
+    'bat',
+    'bath',
+    'bbt',
+    'bcfx',
+    'c98',
+    "eth",
+    "btcb",
+    "usdc",
+    "fxs",
+    "mc",
+    "frax",
+    "dai",
+    "woo",
+    "uni",
+    "super",
+]
+coins2= {
+    "BEL": "0xa91ac63d040deb1b7a5e4d4134ad23eb0ba07e14",
+    "AXS": "0xf5b0c8a6a4817d1ef21941d0693f8ef0d83eb0d3",
+    "ACH": "0xed04915c23f00a313a544955524eb7dbd823143d",
+    "CAKE": "0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82",
+    "8PAY": "0xfe8a6b9e6c1ee8b16c1f7487264b00f3f2f83661",
+    "AAVE": "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9",
+    "ALICE": "0xac51066d7bec65dc4589368da368b212745d63e8",
+    "ALPHA": "0xa1faa113cbe53436df28ff0aee54275c13b40975",
+    "AMPL": "0xd46ba6d942050d489dbd938a2c909a5d5039a161",
+    "ANKR": "0x8290333cef9e6d528dd5618fb97a76f268f3edd4",
+    "ALPACA": "0x8f0528ce5ef7b51152a59745befdd91d97091d2f",
+    "ARPA": "0xba50933c268f567bdd9a2323f39d6a3359e0ffe1",
+    "ARV": "0x6679eb24f59dfe111864aec72b443d1da666b360",
+    "ASR": "0x02d8b46814e4c8f19de6a3d21326410cd8ab52f0",
+    "ATA": "0xa2120b9e674d3fc3875f415a7df52e382f141225",
+    "ATM": "0xa1faa113cbe53436df28ff0aee54275c13b40975",
+    "AXL": "0x3f7aff0ef20aa2e646290dfa1e5d9ca3bef1baf1",
+    "BABYCAKE": "0xdb8d30b74bf098af214e862c90e647bbb1fcc58c",
+    "BAKE": "0xe02df9e3e622debdd69fb838bb799e3f168902c5",
+    "BALBT": "0xba100000625a3754423978a60c9317c58a424e3d",
+    "BAND": "0xba11d3ab8a58d8f53c687c7c77f58b1979f112c6",
+    "BAT": "0x0d8775f648430679a709e98d2b0cb6250d2887ef",
+    "BCFX": "0x1fc31488f28ac846588ffa201cde0669168471bd",
+    "C98": "0xaec945e04baf28b135fa7c640f624f8d90f1c3a6",
+    "ETH": "0x0000000000000000000000000000000000000000",  # Native token
+    "BTCB": "0x7130d2a12b9acbfd57d1b4fc99d68ecb17e2a3d3",
+    "USDC": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "FXS": "0xe48a3d7d0bc88d552f730b62c006bc925eadb9ee",
+    "MC": "0x949d48eca67b17269629c7194f4b727d4ef9e5d6",
+    "FRAX": "0x853d955acef822db058eb8505911ed77f175b99e",
+    "DAI": "0x6b175474e89094c44da98b954eedeac495271d0f",
+    "WOO": "0x4691937a7508860f876c9c0a2a617e7d9e945d4b",
+    "UNI": "0x1f9840a85d5aF5bf1d1762F925BDADdC4201F984",
+    "SUPER": "0xe53ec727dbdeb9e2d5456c3be40cff031ab40a55",
+    "WETH": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+    "USDT": "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+}
+tokens3_reversed = {
+    '0xA91ac63D040dEB1b7A5E4d4134aD23eb0ba07e14': 'BEL',
+    '0xBB0E17EF65F82Ab018d8EDd776e8DD940327B28b': 'AXS',
+    '0xEd04915c23f00A313a544955524EB7DBD823143d': 'ACH',
+    '0x152649eA73beAb28c5b49B26eb48f7EAD6d4c898': 'CAKE',
+    '0x06DDb3a8BC0aBc14f85e974CF1A93a6f8d4909d9': '8PAY',
+    '0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9': 'AAVE',
+    '0xAC51066d7bEC65Dc4589368da368b212745d63E8': 'ALICE',
+    '0xa1faa113cbE53436Df28FF0aEe54275c13B40975': 'ALPHA',
+    '0xD46bA6D942050d489DBd938a2C909A5d5039A161': 'AMPL',
+    '0x8290333ceF9e6D528dD5618Fb97a76f268f3EDD4': 'ANKR',
+    '0x7cA4408137eb639570F8E647d9bD7B7E8717514A': 'ALPACA',
+    '0xBA50933C268F567BDC86E1aC131BE072C6B0b71a': 'ARPA',
+    '0xA2120b9e674d3fC3875f415A7DF52e382F141225': 'ATA',
+    '0x467719aD09025FcC6cF6F8311755809d45a5E5f3': 'AXL',
+    '0x0D8775F648430679A709E98d2b0Cb6250d2887EF': 'BAT',
+    '0xAE12C5930881c53715B369ceC7606B70d8EB229f': 'C98',
+    '0x0000000000000000000000000000000000000000': 'ETH',
+    '0xE57425F1598f9b0d6219706b77f4b3DA573a3695': 'BTCB',
+    '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48': 'USDC',
+    '0x3432B6A60D23Ca0dFCa7761B7ab56459D9C964D0': 'FXS',
+    '0xf4eCEd2f682CE333f96f2D8966C613DeD8fC95DD': 'MC',
+    '0x853d955aCEf822Db058eb8505911ED77F175b99e': 'FRAX',
+    '0x6B175474E89094C44Da98b954EedeAC495271d0F': 'DAI',
+    '0x4691937a7508860F876c9c0a2a617E7d9E945D4B': 'WOO',
+    '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984': 'UNI',
+    '0xe53EC727dbDEB9E2d5456c3be40cFF031AB40A55': 'SUPER',
+    '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2': 'WETH',
+    '0xdAC17F958D2ee523a2206206994597C13D831ec7': 'USDT'
+}
+
+
+
+# print(fact_contr.functions.getPair('0xA91ac63D040dEB1b7A5E4d4134aD23eb0ba07e14', '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2').call())
+
+with open("panRouterV2Abi.json") as f:
+    panrouter_abi = json.load(f)['result']
+with open("pancakefactory.json") as f:
+    panfactory_abi = json.load(f)['result']
+pancake_router_address = Web3.to_checksum_address("0x10ED43C718714eb63d5aA57B78B54704E256024E")
+pancake_factory_address = Web3.to_checksum_address("0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73")
+pancake_router_contract= W3.eth.contract(address=pancake_router_address, abi=panrouter_abi)
+pancake_factory_contract=W3.eth.contract(address=pancake_factory_address, abi=panfactory_abi)
+# print(pancake_factory_contract.functions.getPair('0xA91ac63D040dEB1b7A5E4d4134aD23eb0ba07e14', '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2').call())
+def get_pancake_price_v2(contract, token_a, token_b, amount):
+    """Get Pancake Price"""
+    # try:
+    pair_address = pancake_factory_contract.functions.getPair(token_a, token_b).call()
+    print(pair_address)
+    if not pair_address == "0x0000000000000000000000000000000000000000":
+        decimal_a = 18
+
+        price = pancake_router_contract.functions.getAmountsOut(int(amount * 10 ** decimal_a), [token_a, token_b]).call()
+        print(price)
+        decimal_b = 18
+        return (price[1] / (10 ** decimal_b), 1)
+                # f"{tokens3_reversed[token_a].upper()}/{tokens3_reversed[token_b].upper()}")
+# except ValueError as e:
+    #     print(f"value error : {e}")
+    #     return (0, 'NULL')
+    # except Exception as e:
+    #     print(f"and Expected error has accured {e}")
+    #     return (0, 'NULL')
+
+# print(get_pancake_price_v2(None, '0xA91ac63D040dEB1b7A5E4d4134aD23eb0ba07e14', '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', 1000))
+
+for sCoin in SOLID_COIN:
+            for vCoin in VARIABLE_COIN:
+                    if sCoin != vCoin:
+                        if sCoin.upper() in token6_bep.keys() and vCoin.upper() in token6_bep.keys():
+                            # contract = init_contract(router_buy)
+                            print(sCoin, vCoin)
+                            buy_price, buy_path = get_pancake_price_v2(
+
+                                token_a=W3.to_checksum_address(token6_bep[vCoin.upper()]),
+                                token_b=W3.to_checksum_address(token6_bep[sCoin.upper()]),
+                                contract= None,
+                                amount=10000)
+                            print(buy_price, buy_path)
+
+
+
+
+
+
+
+
+
+
+
+
+
