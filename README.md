@@ -1,34 +1,91 @@
 # Crypto Arbitrage Tracker
 
-**Crypto Arbitrage Tracker** is a Python-based tool that monitors cryptocurrency prices across centralized and decentralized exchanges to identify real-time arbitrage opportunities. It helps traders spot and act on price discrepancies across platforms.
+**Crypto Arbitrage Tracker** is a powerful Python-based tool that monitors **real-time price data of 69 ERC-20 tokens** across **9 centralized and decentralized exchanges**. It analyzes price discrepancies and helps uncover **arbitrage opportunities** in the crypto markets. The project is modular, scalable, and has the **potential to integrate Flash Loans and Flash Swaps** for fully automated arbitrage execution.
 
-## Features
+---
 
-* 🏦 **Multi-Exchange Integration**: Supports Binance, Coinbase, Bitfinex, Bybit, Bitvavo, DODO, DYDX, Balancer, and more.
-* 📡 **Live Price Tracking**: Fetches and compares token prices from multiple sources.
-* ⚡ **Arbitrage Opportunity Detection**: Calculates price spreads to find profitable arbitrage paths.
-* 🤖 **Front-Running Simulation**: Includes a basic front-running bot logic for testing.
-* 🔌 **Modular Codebase**: Easy to extend with new exchanges or algorithms.
+## ⚙️ Key Features
 
-## Getting Started
+* 🔄 **69 ERC-20 Tokens** supported
+* 🌐 **Multi-Exchange Integration**:
 
-### Prerequisites
+  * **Centralized Exchanges**:
 
-* Python 3.8 or higher
-* Git (for cloning)
-* Internet connection (for API calls)
+    * Binance
+    * Bitfinex
+    * Bitvavo
+    * Coinbase
+    * LBank
+  * **Decentralized Exchanges**:
 
-### Installation
+    * PancakeSwap
+    * SushiSwap
+    * DODO
+    * dYdX
+* ⚖️ **Arbitrage Opportunity Detection**:
+
+  * Compares live token prices across all exchanges
+  * Shows best arbitrage opportunities and profit spreads
+* 🧠 **Modular Design**:
+
+  * Each exchange handled via separate script
+  * Easy to add new tokens or exchanges
+* 🚀 **Flash Loan/Swap Ready (Future Scope)**:
+
+  * Can be extended to execute trades automatically using:
+
+    * Aave Flash Loans
+    * Uniswap Flash Swaps
+
+---
+
+## 📂 Project Structure
+
+```
+Crypto-Arbitrage-Tracker/
+├── gamma_app.py                # Main script to run arbitrage tracker
+├── FrontRunnigBot.py           # Prototype front-running bot (simulated)
+├── [exchange]_price.py         # Individual scripts for each exchange
+│   ├── binance_price.py
+│   ├── coinbase_price.py
+│   ├── bitvavo_price.py
+│   ├── bitfinex_price.py
+│   ├── bybit_price.py
+│   ├── pancake_price.py
+│   ├── sushiswap_price.py
+│   ├── dodo_price.py
+│   └── dydx_price.py
+├── contracts/
+│   ├── ERC20Abi.json
+│   └── UniswapAbi.json
+├── arbitrage_data.csv          # Sample data log
+├── requirements.txt            # Python dependencies
+└── README.md
+```
+
+---
+
+## 🚀 Getting Started
+
+### 🧰 Prerequisites
+
+* Python 3.8 or later
+* Git
+* Internet access (for live exchange APIs)
+
+### 🔧 Installation
 
 ```bash
 git clone https://github.com/Suryanshu01/Crypto-Arbitrage-Tracker.git
 cd Crypto-Arbitrage-Tracker
 python -m venv env
-source env/bin/activate   # Windows: env\Scripts\activate
+source env/bin/activate   # On Windows: env\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### Usage
+---
+
+## ▶️ Usage
 
 To run the arbitrage tracker:
 
@@ -36,38 +93,42 @@ To run the arbitrage tracker:
 python gamma_app.py
 ```
 
-> This is the main entry point and uses all exchange modules to fetch live prices and display arbitrage opportunities.
+This will:
 
-## Project Structure
-
-```
-Crypto-Arbitrage-Tracker/
-├── gamma_app.py              # Main runner script
-├── FrontRunnigBot.py         # Front-running bot prototype
-├── [exchange]_price.py       # Price fetchers for each exchange
-├── contracts/                # Smart contract ABIs (Uniswap, ERC20)
-├── arbitrage_data.csv        # Sample data file
-├── requirements.txt          # Dependencies
-├── README.md                 # Project documentation
-└── ... (other utility files)
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create a new branch: `git checkout -b feature/my-feature`
-3. Commit your changes: `git commit -m "Add feature"`
-4. Push and open a PR
-
-## License
-
-[MIT](LICENSE)
-
-## Author
-
-[Suryanshu01](https://github.com/Suryanshu01)
+* Fetch prices of 69 ERC-20 tokens from all integrated exchanges
+* Compare them for arbitrage opportunities
+* Display the most profitable arbitrage path (if any)
 
 ---
 
-Let me know if you want badges (e.g., Python version, license), screenshots, or a sample terminal output added.
+## 🔮 Future Enhancements
 
+* 💰 **Flash Loan / Flash Swap Integration** for:
+
+  * Zero upfront capital arbitrage
+  * Atomic execution of multi-hop trades
+* 📉 **Real-time Graphs & Dashboard** using Plotly or Dash
+* 📦 **Export Arbitrage Logs to JSON / CSV**
+* 🛠️ **CLI Tool** to generate Merkle Proofs for token sets
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repo
+2. Create a branch: `git checkout -b feature/my-feature`
+3. Commit: `git commit -m "Add feature"`
+4. Push: `git push origin feature/my-feature`
+5. Submit a PR
+
+---
+
+## 📜 License
+
+[MIT License](LICENSE)
+
+---
+
+## 👨‍💻 Author
+
+[Suryanshu01](https://github.com/Suryanshu01)
