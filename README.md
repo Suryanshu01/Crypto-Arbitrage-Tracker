@@ -19,6 +19,7 @@
   * **Decentralized Exchanges**:
 
     * PancakeSwap
+    * Uniswap
     * SushiSwap
     * DODO
     * dYdX
