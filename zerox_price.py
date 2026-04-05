@@ -5,7 +5,7 @@ def get_token_price(token_a, token_b, amount):
     url = f'https://api.0x.org/swap/v1/quote?sellToken={token_a}&buyToken={token_b}&sellAmount={amount}'
     headers = {
         'Content-Type': 'application/json',
-        '0x-api-key': "e8b578c0-7bc4-4e73-b4ee-7f7aa7249eaa",
+        '0x-api-key': "",
     }
     response = requests.get(url, headers=headers)
 
